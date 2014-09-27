@@ -15,11 +15,7 @@ def poll_valid_context(ctx):
         or bpy.context.active_object.type != 'ARMATURE' \
         or ctx.mode != 'OBJECT':
         return False
-        # Only allow rigs with a "rigify id"
-    try:
-        return ctx.active_object.data.get("rig_id")
-    except (AttributeError, KeyError, TypeError):
-        return False
+    return True
 
 
 class OBJECT_OT_bake_rigify(bpy.types.Operator):
