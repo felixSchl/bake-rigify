@@ -146,18 +146,29 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         for b in ebs:
             if b.name.startswith('EXP') or b.name == 'root':
                 b.select = True
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='POSE')
         bpy.ops.object.mode_set(mode='OBJECT')
 
         # Perform the bake
+        # Need to switch the area type (See: http://blenderartists.org/forum/archive/index.php/t-195704.html)
         current_type = ''
+        if not bpy.app.background:
+            current_type = bpy.context.area.type
+            bpy.context.area.type = 'NLA_EDITOR'
         bpy.ops.nla.bake(
             frame_start=bakeArma.animation_data.action.frame_range[0],
             frame_end=bakeArma.animation_data.action.frame_range[1],
             step=1,
-            only_selected=True,
+            visual_keying=True,
+            only_selected=False,
             clear_constraints=True,
+            clear_parents=True,
             bake_types={'POSE'},
         )
+        if not bpy.app.background:
+            bpy.context.area.type = current_type
 
         # Set Name for Baked Action
         actnName = origArma.animation_data.action.name
