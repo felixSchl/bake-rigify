@@ -17,3 +17,8 @@ only, but as a tool that allows to generate the animations that suit a baked
 rig. Since Blender is cool about sharing animations, e.g. it just cares about
 names, the baked animations are valid across all baked rigs for as long as the
 source rigify rig and the original animations did not change.
+
+## Caveats
+
+Currently only works properly with Blender 2.64. Something must have changed
+in the way animations are baked in later versions that make this addon unusable.
