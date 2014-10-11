@@ -17,15 +17,51 @@ def poll_valid_context(ctx):
         return False
     return True
 
-
 class OBJECT_OT_bake_rigify(bpy.types.Operator):
     bl_label = 'Bake Rigify rig'
     bl_idname = 'object.bake_rigify'
     bl_options = {"REGISTER"}
 
+    action_selection = bpy.props.EnumProperty(
+        items=[ ("all", "All actions", "", "", 0)
+              , ("active", "Active action", "", "", 1)
+              , ("selected", "Selected actions", "", "", 2)
+              ],
+        name="Export all actions",
+        default="all"
+        )
+
+    actions = bpy.props.BoolVectorProperty(
+        name="Selected actions",
+        size=32,
+        )
+
+    def check(self, ctx):
+        return True
+
     @classmethod
     def poll(cls, ctx):
         return poll_valid_context(ctx)
+
+    def draw(self, ctx):
+        layout = self.layout
+
+        if not len(bpy.data.actions):
+            col.label("No actions available", 'ERROR')
+            return
+
+        row = layout.row()
+        row.prop(self, "action_selection")
+
+        if self.action_selection == "selected":
+
+            row = layout.row()
+            row.label(text="Select actions:")
+            row = layout.row()
+            col = row.column_flow(columns=2, align=True)
+
+            for i, action in enumerate(bpy.data.actions):
+                col.prop(self, "actions", index=i, text=action.name)
 
     def invoke(self, context, event):
         wm = context.window_manager
