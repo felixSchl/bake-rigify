@@ -21,10 +21,15 @@ def poll_valid_context(ctx):
 class OBJECT_OT_bake_rigify(bpy.types.Operator):
     bl_label = 'Bake Rigify rig'
     bl_idname = 'object.bake_rigify'
+    bl_options = {"REGISTER"}
 
     @classmethod
     def poll(cls, ctx):
         return poll_valid_context(ctx)
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
 
     def select_bone(self, armature, bone_name):
         """
@@ -62,9 +67,6 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         # Make Single User Armature Data (will be modified)
         bpy.ops.object.make_single_user(obdata=True)
-
-        # Move the Bake Armature off to the site for debugging
-        # bpy.ops.transform.translate(value=(3, 0, 0))
 
         # Toggle into edit mode
         bpy.ops.object.mode_set(mode='EDIT')
@@ -111,11 +113,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
 
         # Perform the bake
-        # Need to switch the area type (See: http://blenderartists.org/forum/archive/index.php/t-195704.html)
         current_type = ''
-        if not bpy.app.background:
-            current_type = bpy.context.area.type
-            bpy.context.area.type = 'NLA_EDITOR'
         bpy.ops.nla.bake(
             frame_start=bakeArma.animation_data.action.frame_range[0],
             frame_end=bakeArma.animation_data.action.frame_range[1],
@@ -124,8 +122,6 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             clear_constraints=True,
             bake_types={'POSE'},
         )
-        if not bpy.app.background:
-            bpy.context.area.type = current_type
 
         # Set Name for Baked Action
         actnName = origArma.animation_data.action.name
@@ -144,6 +140,8 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         for b in ebs:
             b.use_deform = True
             b.name = "DEF%s" % b.name[3:] if not b.name == 'root' else b.name
+            b.layers = [False for _ in range(0, 32)]
+            b.layers[0] = True
             dup_bone_names.append(b.name)
 
         # Remove left-over constraints (nla.bake() may leave residue)
@@ -152,8 +150,8 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             [b.constraints.remove(c) for c in b.constraints]
 
         # Set the layers to what matters only
-        for i in range(0, 32):
-            bakeArma.data.layers[i] = True if (i in (28, 29)) else False
+        bakeArma.data.layers = [False for _ in range(0, 32)]
+        bakeArma.data.layers[0] = True
 
         # Add static root bone
         # Info: The static root bone is the original root bone's parent that does not move.
