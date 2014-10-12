@@ -11,8 +11,8 @@ bl_info = {
 
 
 def poll_valid_context(ctx):
-    if not bpy.context.active_object \
-        or bpy.context.active_object.type != 'ARMATURE' \
+    if not ctx.active_object \
+        or ctx.active_object.type != 'ARMATURE' \
         or ctx.mode != 'OBJECT':
         return False
     return True
@@ -92,14 +92,41 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         return duplicated_bone
 
     def execute(self, ctx):
+
+        arma = ctx.active_object
+
+        actions = []
+
+        if self.action_selection == "all":
+            actions = [action.name for action in bpy.data.actions]
+        elif self.action_selection == "active":
+            actions = [arma.animation_data.action.name]
+        elif self.action_selection == "selected":
+            actions = [action.name for i, action in enumerate(bpy.data.actions) if self.actions[i]]
+
+        i = 0
+        for name in actions:
+            self.export(ctx, arma, bpy.data.actions.get(name), keep=i==0)
+            i += 1
+
+        return { 'FINISHED' }
+
+    def export(self, ctx, arma, action, keep=False):
+
+        bpy.ops.object.select_all(action='DESELECT')
+
         # Original Armature
-        origArma = bpy.context.active_object
+        origArma = arma
         origArmaName = origArma.name
+        current_type = ''
+        ctx.scene.objects.active = origArma
+        origArma.select = True
 
         # Bake Armature
         bpy.ops.object.duplicate(linked=False)
-        bakeArma = bpy.context.active_object
+        bakeArma = ctx.active_object
         bakeArmaName = bakeArma.name
+        bakeArma.animation_data.action = action
 
         # Make Single User Armature Data (will be modified)
         bpy.ops.object.make_single_user(obdata=True)
@@ -108,8 +135,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='EDIT')
 
         # Turn all layers visible for operators to work
-        for i in range(0, 32):
-            bakeArma.data.layers[i] = True
+        bakeArma.data.layers = [True for _ in range(0, 32)]
 
         # Collect all edit bones
         ebs = bakeArma.data.edit_bones
@@ -155,8 +181,8 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         # Need to switch the area type (See: http://blenderartists.org/forum/archive/index.php/t-195704.html)
         current_type = ''
         if not bpy.app.background:
-            current_type = bpy.context.area.type
-            bpy.context.area.type = 'NLA_EDITOR'
+            current_type = ctx.area.type
+            ctx.area.type = 'NLA_EDITOR'
         bpy.ops.nla.bake(
             frame_start=bakeArma.animation_data.action.frame_range[0],
             frame_end=bakeArma.animation_data.action.frame_range[1],
@@ -168,12 +194,10 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             bake_types={'POSE'},
         )
         if not bpy.app.background:
-            bpy.context.area.type = current_type
+            ctx.area.type = current_type
 
         # Set Name for Baked Action
-        actnName = origArma.animation_data.action.name
-        actnName = actnName[2:] if actnName.startswith('a_') else actnName
-        bakeArma.animation_data.action.name = "baked_%s" % actnName
+        bakeArma.animation_data.action.name = action.name + ".baked"
 
         # Delete all un-selected bones
         bpy.ops.object.mode_set(mode='EDIT')
@@ -203,7 +227,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         # Add static root bone
         # Info: The static root bone is the original root bone's parent that does not move.
         # This avoids ``Delta Translation`` issues
-        bpy.context.scene.cursor_location = (0, 0, 0)
+        ctx.scene.cursor_location = (0, 0, 0)
         bpy.ops.object.mode_set(mode='EDIT')
         oldRoot = bakeArma.data.edit_bones['root']
         oldRoot.name = 'dummy'
@@ -236,6 +260,14 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
+        bpy.ops.object.select_all(action='DESELECT')
+        if not keep:
+            bakeArma.select = True
+            ctx.scene.objects.active = bakeArma
+            bpy.ops.object.delete()
+
+        ctx.scene.objects.active = origArma
+
         return {'FINISHED'}
 
 
@@ -263,3 +295,4 @@ def register():
 def unregister():
     bpy.utils.unregister_class(OBJECT_PT_bake_rigify)
     bpy.utils.unregister_class(OBJECT_OT_bake_rigify)
+
