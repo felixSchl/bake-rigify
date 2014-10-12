@@ -5,7 +5,7 @@ bl_info = {
     "name": "Bake Rigify rig",
     "author": "Felix Schlitter",
     "version": (0, 1),
-    "blender": (2, 6, 3),
+    "blender": (2, 7, 2),
     "category": "Import-Export"
 }
 
