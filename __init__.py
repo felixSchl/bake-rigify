@@ -36,6 +36,21 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         size=32,
         )
 
+    delimiter = bpy.props.StringProperty(
+        name="Delimiter",
+        default="|"
+        )
+
+    action_names = bpy.props.StringProperty(
+        name="Action names"
+        )
+
+    suffix = bpy.props.StringProperty(
+        name="Suffix",
+        description="String appended to baked action names",
+        default=".baked"
+        )
+
     def check(self, ctx):
         return True
 
@@ -97,7 +112,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         actions = []
 
-        if self.action_selection == "all":
+        if self.action_names is not None:
+            actions = self.action_names.split(self.delimiter)
+        elif self.action_selection == "all":
             actions = [action.name for action in bpy.data.actions]
         elif self.action_selection == "active":
             actions = [arma.animation_data.action.name]
@@ -106,12 +123,12 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         i = 0
         for name in actions:
-            self.export(ctx, arma, bpy.data.actions.get(name), keep=i==0)
+            self.bake(ctx, arma, bpy.data.actions.get(name), keep=i==0)
             i += 1
 
         return { 'FINISHED' }
 
-    def export(self, ctx, arma, action, keep=False):
+    def bake(self, ctx, arma, action, keep=False):
 
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -197,7 +214,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             ctx.area.type = current_type
 
         # Set Name for Baked Action
-        bakeArma.animation_data.action.name = action.name + ".baked"
+        bakeArma.animation_data.action.name = action.name + self.suffix
 
         # Delete all un-selected bones
         bpy.ops.object.mode_set(mode='EDIT')
@@ -265,6 +282,8 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             bakeArma.select = True
             ctx.scene.objects.active = bakeArma
             bpy.ops.object.delete()
+        else:
+            bakeArma.name = origArma.name + self.suffix
 
         ctx.scene.objects.active = origArma
 
