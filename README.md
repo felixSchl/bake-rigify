@@ -5,13 +5,15 @@ Bake Rigify
 
 ## How it works
 
-* Duplicate selected armature
-* Create bone for each deformation bone (called `DEF-` bones) in armature (called `EXP-` bones)
-* Parent each bone to the `root` bone (that bone must exist in the original armature)
-* Parent constraint the new bones to their deformation bone counterparts
-* Bake the selected set of actions (all | selected | active)
-* Discard all but duplicated bones
-* Rename remaining `EXP-` bones back to what they were called, so assigned weights will work etc.
+In essence, the operator
+
+* Duplicates the selected armature
+* Creates a bone for each deformation bone (called `DEF-` bones) in armature (called `EXP-` bones)
+* Parents each bone to the `root` bone (that bone must exist in the original armature)
+* Parent constraints the new bones to their deformation bone counterparts
+* Bakes the selected set of actions (all | selected | active)
+* Discards all but duplicated bones
+* Renames remaining `EXP-` bones back to what they were called, so assigned weights will work etc.
 
 ## Using a non-rigify rig
 
