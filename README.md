@@ -17,6 +17,16 @@ In essence, the operator
 * Discards all but duplicated bones
 * Renames remaining `EXP-` bones back to what they were called, so assigned weights will work etc.
 
+## Installation
+
+* Clone the repo to into, e.g.  [...]/blender.app/Contents/Resources/2.74/scripts/addons/bake-rigify
+* In Blender's add-on manager (File-->User Preferences-->Addons), search and enable the `bake rigify` add on.
+
+# Usage
+
+* Select an armature in Object mode.
+* In the Properties Panel, under the Armature data tab, expand `Rigify Bake` and hit the button there.
+
 ## Using a non-rigify rig
 
 This script is making use of rigify conventions, where
