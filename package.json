@@ -1,0 +1,24 @@
+{
+  "name": "bake-rigify",
+  "version": "0.1.1",
+  "description": "Strip rigify-styled rigs down to their deformation bones and bake their animations",
+  "main": "__init__.py",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/felixschl/bake-rigify"
+  },
+  "keywords": [
+    "bake",
+    "rigify",
+    "blender"
+  ],
+  "author": "Felix Schlitter <felixschlitter@gmai.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felixschl/bake-rigify/issues"
+  },
+  "homepage": "https://github.com/felixschl/bake-rigify"
+}

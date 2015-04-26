@@ -1,0 +1,6 @@
+*.DS_Store
+*.sw[opqrst]
+*.un~
+bake-rigify/
+node_modules/
+bake-rigify-*.zip
