@@ -19,10 +19,12 @@ In essence, the operator
 
 ## Installation
 
-* Clone the repo to into, e.g.  [...]/blender.app/Contents/Resources/2.74/scripts/addons/bake-rigify
-* In Blender's add-on manager (File-->User Preferences-->Addons), search and enable the `bake rigify` add on.
+* Download the [Latest Release archive zip](https://github.com/felixSchl/bake-rigify/releases)
+* In Blender's add-on manager (File-->User Preferences-->Addons), using
+  `Install from File`, install the zip downloaded.
+* Now enable the `Bake Rigify` addon.
 
-# Usage
+## Usage
 
 * Select an armature in Object mode.
 * In the Properties Panel, under the Armature data tab, expand `Rigify Bake` and hit the button there.
