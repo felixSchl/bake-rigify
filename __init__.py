@@ -124,6 +124,9 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         i = 0
         for name in actions:
+            action = bpy.data.actions.get(name)
+            if not action:
+                continue
             self.bake(ctx, arma, bpy.data.actions.get(name), keep=i==0)
             i += 1
 
