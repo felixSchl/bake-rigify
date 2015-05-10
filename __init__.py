@@ -62,6 +62,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         layout = self.layout
 
         if not len(bpy.data.actions):
+            col = layout.column()
             col.label("No actions available", 'ERROR')
             return
 
