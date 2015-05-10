@@ -307,7 +307,16 @@ class OBJECT_PT_bake_rigify(bpy.types.Panel):
 
     def draw(self, ctx):
         layout = self.layout
-        layout.operator('object.bake_rigify')
+
+        valid = True
+        if not len(bpy.data.actions):
+            valid = False
+            col = layout.column()
+            col.label("No actions available", icon='ERROR')
+
+        row = layout.row()
+        row.enabled = valid
+        row.operator('object.bake_rigify')
 
 
 def register():
