@@ -20,5 +20,12 @@
   "bugs": {
     "url": "https://github.com/felixschl/bake-rigify/issues"
   },
-  "homepage": "https://github.com/felixschl/bake-rigify"
+  "homepage": "https://github.com/felixschl/bake-rigify",
+  "dependencies": {
+    "bluebird": "^2.9.25",
+    "jszip": "^2.5.0",
+    "kopeer": "^0.2.0",
+    "lodash": "^3.8.0",
+    "rimraf": "^2.3.3"
+  }
 }
