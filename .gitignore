@@ -4,3 +4,4 @@
 bake-rigify/
 node_modules/
 bake-rigify-*.zip
+__pycache__
