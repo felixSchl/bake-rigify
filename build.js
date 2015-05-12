@@ -13,7 +13,9 @@ var pkg = require('./package.json')
 Promise.resolve()
 
     .bind({
-        version: pkg.version
+        name:    pkg.name
+      , version: pkg.version
+      , blender: pkg.blender
       , output:  path.join(__dirname, 'bake-rigify-' + pkg.version + '.zip')
     })
 
@@ -25,49 +27,59 @@ Promise.resolve()
         ]);
     })
 
-    /* Copy files to output directory. */
-    .then(function() {
-        return Promise.all(
-            _.map([ '__init__.py', 'README.md' ]
-              , function(filename) {
-                    return kopeer.file(
-                        path.join(__dirname, filename)
-                      , path.join(__dirname, './bake-rigify/')
-                    );
-                }
-            )
-        );
-    })
-
     /* Update __init__.py version */
     .then(function() {
         return (
             fs.readFileAsync(path.join(
-                __dirname, './bake-rigify/', '__init__.py'
+                __dirname, '__init__.py'
             )).then(_.method('toString', 'utf8'))
         );
     })
     .then(_.method('split', '\n'))
     .then(function(lines) {
         var build = this
-          , version = build.version.split('.').join(', ')
+          , addonVersion = build.version.split('.').join(', ')
+          , blenderVersion = build.blender.version.split('.').join(', ')
         ;
-        return _.map(lines, function(line) {
-            return (/^([ ]*)"version":[ ]*\([0-9, ]*\)/.test(line))
-                ? '    "version": (' + version + '),'
-                : line
-            ;
-        });
+
+        var pre = _.takeWhile(
+            lines
+          , function(line) {
+                return /^bl_info = {$/.test(line) === false;
+            }
+        );
+
+        var post = _.drop(_.dropWhile(
+            _.drop(lines, pre.length)
+          , function(line) {
+                return /^}$/.test(line) === false;
+            }
+        ), 1);
+
+        return pre
+            .concat([
+                "bl_info = {"
+              , [ '    "name":'     + '"' + build.blender.name     + '"'
+                , '    "author":'   + '"' + build.blender.author   + '"'
+                , '    "version":'  + '(' + addonVersion           + ')'
+                , '    "blender":'  + '(' + blenderVersion         + ')'
+                , '    "category":' + '"' + build.blender.category + '"'
+                ].join(',\n')
+              , "}"
+            ])
+            .concat(post)
+        ;
     })
     .then(_.method('join', '\n'))
 
     /* Zip */
-    .then(function() {
+    .then(function(modified) {
         var zip = new JSZip()
           , folder = zip.folder('bake-rigify')
         ;
+
         _.each(
-            [ '__init__.py', 'README.md' ]
+            [ 'README.md' ]
           , function(filename) {
                 folder.file(
                     filename
@@ -75,6 +87,8 @@ Promise.resolve()
                 );
             }
         );
+
+        folder.file('__init__.py', modified);
 
         return fs.writeFileAsync(
             this.output
