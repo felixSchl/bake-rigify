@@ -95,4 +95,8 @@ Promise.resolve()
           , zip.generate({type: 'nodebuffer'})
         );
     })
+
+    .then(function() {
+      console.log(this.output);
+    })
 ;
