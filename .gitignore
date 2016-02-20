@@ -3,5 +3,6 @@
 *.un~
 bake-rigify/
 node_modules/
-bake-rigify-*.zip
+bake-rigify*.zip
 __pycache__
+npm-debug.log

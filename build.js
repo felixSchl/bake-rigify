@@ -16,7 +16,7 @@ Promise.resolve()
         name:    pkg.name
       , version: pkg.version
       , blender: pkg.blender
-      , output:  path.join(__dirname, 'bake-rigify-' + pkg.version + '.zip')
+      , output:  path.join(__dirname, 'bake-rigify.zip')
     })
 
     /* Clean output directory. */
