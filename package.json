@@ -1,13 +1,13 @@
 {
   "name": "bake-rigify",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Strip rigify-styled rigs down to their deformation bones and bake their animations",
   "main": "__init__.py",
   "blender": {
-      "name": "Bake Rigify rig",
-      "author": "Felix Schlitter",
-      "version": "2.7.2",
-      "category": "Import-Export"
+    "name": "Bake Rigify rig",
+    "author": "Felix Schlitter",
+    "version": "2.7.2",
+    "category": "Import-Export"
   },
   "scripts": {
     "build": "node build.js"
