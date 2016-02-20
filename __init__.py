@@ -2,11 +2,11 @@ import bpy
 
 
 bl_info = {
-    "name": "Bake Rigify rig",
-    "author": "Felix Schlitter",
-    "version": (0, 1, 1),
-    "blender": (2, 7, 2),
-    "category": "Import-Export"
+    'name': 'Bake Rigify rig',
+    'author': 'Felix Schlitter',
+    'version': (0, 1, 1),
+    'blender': (2, 7, 2),
+    'category': 'Import-Export'
 }
 
 
@@ -20,35 +20,35 @@ def poll_valid_context(ctx):
 class OBJECT_OT_bake_rigify(bpy.types.Operator):
     bl_label = 'Bake Rigify rig'
     bl_idname = 'object.bake_rigify'
-    bl_options = {"REGISTER"}
+    bl_options = {'REGISTER'}
 
     action_selection = bpy.props.EnumProperty(
-        items=[ ("all", "All actions", "", "", 0)
-              , ("active", "Active action", "", "", 1)
-              , ("selected", "Selected actions", "", "", 2)
+        items=[ ('all', 'All actions', '', '', 0)
+              , ('active', 'Active action', '', '', 1)
+              , ('selected', 'Selected actions', '', '', 2)
               ],
-        name="Export all actions",
-        default="all"
+        name='Export all actions',
+        default='all'
         )
 
     actions = bpy.props.BoolVectorProperty(
-        name="Selected actions",
+        name='Selected actions',
         size=32,
         )
 
     delimiter = bpy.props.StringProperty(
-        name="Delimiter",
-        default="|"
+        name='Delimiter',
+        default='|'
         )
 
     action_names = bpy.props.StringProperty(
-        name="Action names"
+        name='Action names'
         )
 
     suffix = bpy.props.StringProperty(
-        name="Suffix",
-        description="String appended to baked action names",
-        default=".baked"
+        name='Suffix',
+        description='String appended to baked action names',
+        default='.baked'
         )
 
     def check(self, ctx):
@@ -63,31 +63,31 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         if not len(bpy.data.actions):
             col = layout.column()
-            col.label("No actions available", 'ERROR')
+            col.label('No actions available', 'ERROR')
             return
 
         row = layout.row()
-        row.prop(self, "action_selection")
+        row.prop(self, 'action_selection')
 
-        if self.action_selection == "selected":
+        if self.action_selection == 'selected':
 
             row = layout.row()
-            row.label(text="Select actions:")
+            row.label(text='Select actions:')
             row = layout.row()
             col = row.column_flow(columns=2, align=True)
 
             for i, action in enumerate(bpy.data.actions):
-                col.prop(self, "actions", index=i, text=action.name)
+                col.prop(self, 'actions', index=i, text=action.name)
 
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
     def select_bone(self, armature, bone_name):
-        """
+        '''
         Select bone in armature
         INFO: Operates in EDIT MODE - Ends in OBJECT MODE
-        """
+        '''
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.select_all(action='DESELECT')
         edit_bone = armature.data.edit_bones[bone_name]
@@ -97,10 +97,10 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         return armature.data.bones.active
 
     def duplicate_bone(self):
-        """
+        '''
         Duplicates current bone
         INFO: Operates in EDIT MODE
-        """
+        '''
         bpy.ops.armature.duplicate()
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.mode_set(mode='EDIT')
@@ -115,11 +115,11 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         if self.action_names is not None:
             actions = self.action_names.split(self.delimiter)
-        elif self.action_selection == "all":
+        elif self.action_selection == 'all':
             actions = [action.name for action in bpy.data.actions]
-        elif self.action_selection == "active":
+        elif self.action_selection == 'active':
             actions = [arma.animation_data.action.name]
-        elif self.action_selection == "selected":
+        elif self.action_selection == 'selected':
             actions = [action.name for i, action in enumerate(bpy.data.actions) if self.actions[i]]
 
         i = 0
@@ -168,7 +168,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
             # Duplicate current bone
             bpy.ops.object.mode_set(mode='EDIT')
             duplicated_bone = self.duplicate_bone()
-            duplicated_bone.name = "EXP%s" % defBoneName[3:]
+            duplicated_bone.name = 'EXP%s' % defBoneName[3:]
 
             # Process all deformation bones
             duplicated_bone.parent = None
@@ -231,7 +231,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
         dup_bone_names = []
         for b in ebs:
             b.use_deform = True
-            b.name = "DEF%s" % b.name[3:] if not b.name == 'root' else b.name
+            b.name = 'DEF%s' % b.name[3:] if not b.name == 'root' else b.name
             b.layers = [False for _ in range(0, 32)]
             b.layers[0] = True
             dup_bone_names.append(b.name)
@@ -260,7 +260,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         # Remove all animation from root and dummy
         bpy.ops.object.mode_set(mode='POSE')
-        for b in ["root", "dummy"]:
+        for b in ['root', 'dummy']:
             for f in range(int(bakeArma.animation_data.action.frame_range[1] + 1)):
                 bakeArma.keyframe_delete('pose.bones["%s"].scale' % b, index=-1, frame=f)
                 bakeArma.keyframe_delete('pose.bones["%s"].location' % b, index=-1, frame=f)
@@ -275,7 +275,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         # Now re-parent all bones to the dummy and then it's done
         bpy.ops.object.mode_set(mode='EDIT')
-        dummyEB = bakeArma.data.edit_bones["dummy"]
+        dummyEB = bakeArma.data.edit_bones['dummy']
         for b in dup_bone_names:
             bakeArma.data.edit_bones[b].parent = dummyEB
 
@@ -295,10 +295,10 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
 
 class OBJECT_PT_bake_rigify(bpy.types.Panel):
-    bl_label = "Rigify Bake"
+    bl_label = 'Rigify Bake'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
-    bl_context = "data"
+    bl_context = 'data'
     bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
@@ -312,7 +312,7 @@ class OBJECT_PT_bake_rigify(bpy.types.Panel):
         if not len(bpy.data.actions):
             valid = False
             col = layout.column()
-            col.label("No actions available", icon='ERROR')
+            col.label('No actions available', icon='ERROR')
 
         row = layout.row()
         row.enabled = valid
