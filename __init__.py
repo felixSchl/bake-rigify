@@ -4,7 +4,7 @@ import bpy
 bl_info = {
     'name': 'Bake Rigify rig',
     'author': 'Felix Schlitter',
-    'version': (0, 1, 1),
+    'version': (0, 0, 0),
     'blender': (2, 7, 2),
     'category': 'Import-Export'
 }
