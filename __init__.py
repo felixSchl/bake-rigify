@@ -113,7 +113,7 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
 
         actions = []
 
-        if self.action_names is not None:
+        if self.action_names is not None and self.action_names != '':
             actions = self.action_names.split(self.delimiter)
         elif self.action_selection == 'all':
             actions = [action.name for action in bpy.data.actions]
