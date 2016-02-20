@@ -29,27 +29,27 @@ class OBJECT_OT_bake_rigify(bpy.types.Operator):
               ],
         name='Export all actions',
         default='all'
-        )
+    )
 
     actions = bpy.props.BoolVectorProperty(
         name='Selected actions',
         size=32,
-        )
+    )
 
     delimiter = bpy.props.StringProperty(
         name='Delimiter',
         default='|'
-        )
+    )
 
     action_names = bpy.props.StringProperty(
         name='Action names'
-        )
+    )
 
     suffix = bpy.props.StringProperty(
         name='Suffix',
         description='String appended to baked action names',
         default='.baked'
-        )
+    )
 
     def check(self, ctx):
         return True
