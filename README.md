@@ -3,8 +3,6 @@ Bake Rigify
 
 > Strips rigify-styled rigs down to their deformation bones and bakes their animations.
 
-[More information](http://felixschlitter.com/tool/bake-rigify)
-
 ## How it works
 
 In essence, the operator
